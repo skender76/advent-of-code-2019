@@ -38,7 +38,7 @@ func mark_path(panel *[MAX_SIZE][MAX_SIZE]byte, movements []string, wire_color b
 			}
 			
 			for curr_x > end_pos{
-				panel[curr_x][curr_y] += wire_color
+				panel[curr_x][curr_y] |= wire_color
 				curr_x -= 1
 			}
 		} else if direction == "R" {
@@ -48,7 +48,7 @@ func mark_path(panel *[MAX_SIZE][MAX_SIZE]byte, movements []string, wire_color b
 				break
 			}
 			for curr_x < end_pos{
-				panel[curr_x][curr_y] += wire_color
+				panel[curr_x][curr_y] |= wire_color
 				curr_x += 1
 			}
 		} else if direction == "U" {
@@ -58,7 +58,7 @@ func mark_path(panel *[MAX_SIZE][MAX_SIZE]byte, movements []string, wire_color b
 				break
 			}
 			for curr_y < end_pos{
-				panel[curr_x][curr_y] += wire_color
+				panel[curr_x][curr_y] |= wire_color
 				curr_y += 1
 			}
 		} else if direction == "D" {
@@ -68,7 +68,7 @@ func mark_path(panel *[MAX_SIZE][MAX_SIZE]byte, movements []string, wire_color b
 				break
 			}
 			for curr_y > end_pos{
-				panel[curr_x][curr_y] += wire_color
+				panel[curr_x][curr_y] |= wire_color
 				curr_y -= 1
 			}
 		} else {
