@@ -17,7 +17,7 @@ func abs(x int) int {
 	return x
 }
 
-func mark_path(panel *[MAX_SIZE][MAX_SIZE]byte, movements []string) {
+func mark_path(panel *[MAX_SIZE][MAX_SIZE]byte, movements []string, wire_color byte) {
 
 	var curr_x int
 	var curr_y int
@@ -33,25 +33,25 @@ func mark_path(panel *[MAX_SIZE][MAX_SIZE]byte, movements []string) {
 		if direction == "L" {
 			var end_pos = curr_x - offset
 			for curr_x > end_pos{
-				panel[curr_x][curr_y] += 1
+				panel[curr_x][curr_y] += wire_color
 				curr_x -= 1
 			}
 		} else if direction == "R" {
 			var end_pos = curr_x + offset
 			for curr_x < end_pos{
-				panel[curr_x][curr_y] += 1
+				panel[curr_x][curr_y] += wire_color
 				curr_x += 1
 			}
 		} else if direction == "U" {
 			var end_pos = curr_y + offset
 			for curr_y < end_pos{
-				panel[curr_x][curr_y] += 1
+				panel[curr_x][curr_y] += wire_color
 				curr_y += 1
 			}
 		} else if direction == "D" {
 			var end_pos = curr_y - offset
 			for curr_y > end_pos{
-				panel[curr_x][curr_y] += 1
+				panel[curr_x][curr_y] += wire_color
 				curr_y -= 1
 			}
 		} else {
@@ -68,7 +68,7 @@ func find_min_distance(panel [MAX_SIZE][MAX_SIZE]byte) int {
 	for x:= 0; x < MAX_SIZE; x++{
 		for y:= 0; y < MAX_SIZE; y++ {
 			if ( x != ORIG_X ) || ( y != ORIG_Y ) {
-				if panel[x][y] == 2 {
+				if panel[x][y] == 5 {
 					var dist = abs(x - ORIG_X) + abs(y - ORIG_Y)
 					fmt.Println("Point[", x, "][",y,"]: Dist:", dist)
 					if dist < min_dist {
@@ -91,9 +91,9 @@ func calc(input_1, input_2 string) int {
 
 	var panel = [MAX_SIZE][MAX_SIZE]byte{}
 
-	mark_path(&panel, movements_1)
+	mark_path(&panel, movements_1, 1)
 
-	mark_path(&panel, movements_2)
+	mark_path(&panel, movements_2, 4)
 
 	var distance = find_min_distance(panel)
 
