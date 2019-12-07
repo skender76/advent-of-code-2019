@@ -50,12 +50,75 @@ func count_orbit(planet Planet, steps int) int {
 	return steps + next_steps
 }
 
+func count_orbit_to_planet(planet Planet, steps int, dest string) (bool, int) {
+	var found = false
+
+	if planet.Name == dest {
+		found = true
+	} else {
+		steps++
+
+		count_orbit_to_planet(planet, steps, dest)
+		for index, _ := range planet.orbitalPlanets {
+			var found_dest, step_to_dest = count_orbit_to_planet(planet.orbitalPlanets[index], steps, dest)
+			if found_dest {
+				steps += step_to_dest
+			}
+		}
+	}
+
+	return found, steps
+}
+
+func calc_planets_to_dest(root Planet, target string) []string {
+
+	var planets []string
+
+	if root.Name == target {
+		planets = append(planets, root.Name)
+	} else {
+		for index, _ := range root.orbitalPlanets {
+			var next_planets = calc_planets_to_dest(root.orbitalPlanets[index], target)
+
+			if len(next_planets) != 0 {
+				planets = append(planets, root.Name)
+				planets = append(planets, next_planets...)
+			}
+		}
+	}
+	return planets
+}
+
+func calc_orbital_transfers(root Planet, src, dest string) int {
+
+	var planets_to_src = calc_planets_to_dest(root, src)
+	var planets_to_dest = calc_planets_to_dest(root, dest)
+	var number = 0
+
+	fmt.Println(planets_to_src)
+	fmt.Println(planets_to_dest)
+
+	if len(planets_to_src) >= len(planets_to_dest) {
+		number = len(planets_to_dest)
+	} else {
+		number = len(planets_to_src)
+	}
+
+	var index = 0
+	for index=0;index < number; index++ {
+		if planets_to_dest[index] != planets_to_src[index] {
+			break
+		}
+	}
+
+	return ( len(planets_to_src) - index ) + ( len(planets_to_dest) - index ) - 2
+}
+
 func main() {
 	var orbit_map = read_file("input")
 	calculateOrbit(&HEAD, orbit_map)
 
-	var result = -1
-	result = count_orbit(HEAD, result)
+	var result = calc_orbital_transfers(HEAD, "YOU", "SAN")
 
 	fmt.Println(result)
 }
