@@ -15,15 +15,6 @@ func (r *amplifier)calcOutput(input int) int{
 	return output
 }
 
-//type rect struct {
-//	width int
-//	height int
-//}
-//
-//func (r *rect) area() int {
-//	return r.width * r.height
-//}
-
 func amplifier_output(program []int, phase_setting, input int) int {
 	var input_val = []int{phase_setting,input}
 	var _,result = runIntcodeComputer(input_val,  program )
@@ -32,11 +23,23 @@ func amplifier_output(program []int, phase_setting, input int) int {
 
 func calcWaterfallAmpOutput(settingSequence, input []int) int {
 
-	var result = amplifier_output(input,settingSequence[0],0)
-	result = amplifier_output(input,settingSequence[1],result)
-	result = amplifier_output(input,settingSequence[2],result)
-	result = amplifier_output(input,settingSequence[3],result)
-	result = amplifier_output(input,settingSequence[4],result)
+	var A = amplifier{input, settingSequence[0], false}
+	var B = amplifier{input, settingSequence[1], false}
+	var C = amplifier{input, settingSequence[2], false}
+	var D = amplifier{input, settingSequence[3], false}
+	var E = amplifier{input, settingSequence[4], false}
+
+	var halted = false
+	var result = A.calcOutput(0)
+
+	for !halted {
+		result = B.calcOutput(result)
+		result = C.calcOutput(result)
+		result = D.calcOutput(result)
+		result = E.calcOutput(result)
+
+		halted = A.halted && B.halted && C.halted && D.halted && E.halted
+	}
 
 	return result
 }
@@ -57,13 +60,33 @@ func calcMaxThrustherSignal(sequence, input []int) int {
 	return maxSignal
 }
 
+func calcAmpOutputWithFeedback(settingSequence, input []int) int {
+
+	var A = amplifier{input, settingSequence[0], false}
+	var B = amplifier{input, settingSequence[1], false}
+	var C = amplifier{input, settingSequence[2], false}
+	var D = amplifier{input, settingSequence[3], false}
+	var E = amplifier{input, settingSequence[4], false}
+
+	var result = 0
+
+
+	result = A.calcOutput(result)
+	result = B.calcOutput(result)
+	result = C.calcOutput(result)
+	result = D.calcOutput(result)
+	result = E.calcOutput(result)
+
+	return result
+}
+
 func calcMaxThrustherSignalWithFeedback(sequence, input []int) int {
 	var phaseSettings = calcPermutationWithoutRepeatingNumber(sequence)
 	var maxSignal = 0
 
 	for index:=0;index<len(phaseSettings);index++ {
 
-		var thrustherSignal = calcWaterfallAmpOutput(phaseSettings[index], input)
+		var thrustherSignal = calcAmpOutputWithFeedback(phaseSettings[index], input)
 
 		if thrustherSignal > maxSignal {
 			maxSignal = thrustherSignal
