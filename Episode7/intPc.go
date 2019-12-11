@@ -38,7 +38,8 @@ func readOpcode( input int ) (int, int, int, int) {
 	return op_code, mode_first, mode_second, mode_third
 }
 
-func runIntcodeComputer(input_val []int, input []int) int {
+func runIntcodeComputer(input_val []int, input []int) (bool, int) {
+	var halt_reached = false
 	var result = -1
 	var nextOpCodeOffset = 4
 	var input_ptr = 0
@@ -58,6 +59,7 @@ func runIntcodeComputer(input_val []int, input []int) int {
 			input[targetPos] = value
 			nextOpCodeOffset = OFFSET_MUL
 		} else if opcode == HALT {
+			halt_reached = true
 			nextOpCodeOffset = OFFSET_HALT
 			break
 		} else if opcode == SAVE {
@@ -92,7 +94,7 @@ func runIntcodeComputer(input_val []int, input []int) int {
 		}
 	}
 
-	return result
+	return halt_reached, result
 }
 
 func calcPos(input []int, pos, mode int) int {

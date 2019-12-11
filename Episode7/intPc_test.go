@@ -27,7 +27,7 @@ func TestSimpleIntCodeExecution(t *testing.T) {
 		226,677,224,1002,223,2,223,1005,224,629,101,1,223,223,107,226,677,224,102,2,223,223,1005,224,644,101,1,223,223,8,677,677,
 		224,102,2,223,223,1005,224,659,1001,223,1,223,108,677,677,224,1002,223,2,223,1005,224,674,101,1,223,223,4,223,99,226}
 
-	var result = runIntcodeComputer([]int{5}, input)
+	var _,result = runIntcodeComputer([]int{5}, input)
 
 	if result != 11956381 {
 		t.Errorf("Value %d but expected %d", result, 11956381) // to indicate test failed
