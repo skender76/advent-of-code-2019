@@ -1,46 +1,113 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+)
 
 type amplifier struct {
-	program []int
-	phase_setting int
-	halted bool
+	name			   string
+	program            []int
+	phase_setting      int
+	halted             bool
+	instructionPointer int
+	input_ptr		   int
 }
 
 func (r *amplifier)calcOutput(input int) int{
+	var output int = 0
 	var input_val = []int{r.phase_setting,input}
-	var halted,output = runIntcodeComputer(input_val,  r.program )
-	r.halted = halted
+
+	if !r.halted {
+		r.halted,output = r.runIntcodeComputer(input_val)
+	} else {
+		fmt.Println("Input for halted amplifier")
+	}
+
 	return output
 }
 
-func amplifier_output(program []int, phase_setting, input int) int {
-	var input_val = []int{phase_setting,input}
-	var _,result = runIntcodeComputer(input_val,  program )
-	return result
-}
+func (r *amplifier)runIntcodeComputer(input_val []int) (bool, int) {
+	var halt_reached = false
+	var result = 0
 
-func calcWaterfallAmpOutput(settingSequence, input []int) int {
+	for  r.instructionPointer < len(r.program) {
+		var targetPos = 0
+		var value = 0
 
-	var A = amplifier{input, settingSequence[0], false}
-	var B = amplifier{input, settingSequence[1], false}
-	var C = amplifier{input, settingSequence[2], false}
-	var D = amplifier{input, settingSequence[3], false}
-	var E = amplifier{input, settingSequence[4], false}
+		var instruction, mode_first, mode_second, out_mode = readOpcode(r.program[r.instructionPointer])
 
-	var halted = false
-	var result = A.calcOutput(0)
+		if instruction == ADD {
+			targetPos, value = calcSum(r.program, r.instructionPointer, mode_first, mode_second, out_mode)
+			r.program[targetPos] = value
+			r.instructionPointer += OFFSET_SUM
+		} else if instruction == MUL {
+			targetPos, value = calcMul(r.program, r.instructionPointer, mode_first, mode_second, out_mode)
+			r.program[targetPos] = value
+			r.instructionPointer += OFFSET_MUL
+		} else if instruction == HALT {
+			halt_reached = true
+			r.instructionPointer += OFFSET_HALT
+			break
+		} else if instruction == SAVE {
+			var targetPos = calcPos(r.program, r.instructionPointer+1, mode_first)
+			r.program[targetPos] = input_val[r.input_ptr]
+			if r.input_ptr < (len(input_val) - 1) {
+				r.input_ptr++
+			}
 
-	for !halted {
-		result = B.calcOutput(result)
-		result = C.calcOutput(result)
-		result = D.calcOutput(result)
-		result = E.calcOutput(result)
-
-		halted = A.halted && B.halted && C.halted && D.halted && E.halted
+			r.instructionPointer += OFFSET_SAVE
+		} else if instruction == OUT {
+			var targetPos = calcPos(r.program, r.instructionPointer+1, mode_first)
+			result=  r.program[targetPos]
+			r.instructionPointer += OFFSET_OUT
+			break
+		} else if instruction == EQUAL {
+			targetPos, value = calcEqual(r.program, r.instructionPointer, mode_first, mode_second, out_mode)
+			r.program[targetPos] = value
+			r.instructionPointer += OFFSET_EQUAL
+		} else if instruction == JUMP_IF_FALSE {
+			r.instructionPointer = calcJumpIfFalsePos(r.program, r.instructionPointer, mode_first, mode_second)
+		} else if instruction == JUMP_IF_TRUE {
+			r.instructionPointer = calcJumpIfTruePos(r.program, r.instructionPointer, mode_first, mode_second)
+		} else if instruction == LESS_THAN {
+			targetPos, value = calcLessThan(r.program, r.instructionPointer, mode_first, mode_second, out_mode)
+			r.program[targetPos] = value
+			r.instructionPointer += OFFSET_LESS_THAN
+		}else {
+			fmt.Println("Wrong...")
+			break
+		}
 	}
 
+	return halt_reached, result
+}
+
+
+func calcAmpOutputWithFeedback(settingSequence, input []int) int {
+
+	var A = amplifier{"A",clone(input), settingSequence[0], false, 0,0}
+	var B = amplifier{"B",clone(input), settingSequence[1], false,0,0 }
+	var C = amplifier{"C",clone(input), settingSequence[2], false,0,0}
+	var D = amplifier{"D",clone(input), settingSequence[3], false,0,0}
+	var E = amplifier{"E",clone(input), settingSequence[4], false,0,0}
+
+	var halted = false
+	var result = 0
+
+	for !halted {
+
+		var curr_result = result
+		curr_result = A.calcOutput(curr_result)
+		curr_result = B.calcOutput(curr_result)
+		curr_result = C.calcOutput(curr_result)
+		curr_result = D.calcOutput(curr_result)
+		curr_result = E.calcOutput(curr_result)
+		if E.halted {
+			break
+		} else {
+			result = curr_result
+		}
+	}
 	return result
 }
 
@@ -60,13 +127,13 @@ func calcMaxThrustherSignal(sequence, input []int) int {
 	return maxSignal
 }
 
-func calcAmpOutputWithFeedback(settingSequence, input []int) int {
+func calcWaterfallAmpOutput(settingSequence, input []int) int {
 
-	var A = amplifier{input, settingSequence[0], false}
-	var B = amplifier{input, settingSequence[1], false}
-	var C = amplifier{input, settingSequence[2], false}
-	var D = amplifier{input, settingSequence[3], false}
-	var E = amplifier{input, settingSequence[4], false}
+	var A = amplifier{"A",clone(input), settingSequence[0], false,0,0}
+	var B = amplifier{"B",clone(input), settingSequence[1], false,0,0}
+	var C = amplifier{"C",clone(input), settingSequence[2], false,0,0}
+	var D = amplifier{"D",clone(input), settingSequence[3], false,0,0}
+	var E = amplifier{"E",clone(input), settingSequence[4], false,0,0}
 
 	var result = 0
 
