@@ -1,9 +1,43 @@
 package main
 
+
+
 type Asteroid struct {
 	x int
 	y int
 	observable_asteroids int
+	visibileAstroids []Asteroid
+	angular_coeff_from_base float64
+}
+
+func NewAsteroid() *Asteroid {
+	p := new(Asteroid)
+	p.x = 0
+	p.y = 0
+	p.observable_asteroids = 0
+	p.visibileAstroids = []Asteroid{}
+	p.angular_coeff_from_base = 0.0
+	return p
+}
+
+func NewAsteroidInPosition(x,y int) *Asteroid {
+	p := new(Asteroid)
+	p.x = x
+	p.y = y
+	p.observable_asteroids = 0
+	p.visibileAstroids = []Asteroid{}
+	p.angular_coeff_from_base = 0.0
+	return p
+}
+
+func (r *Asteroid)equal(asteroid Asteroid) bool {
+	isEqual := false
+
+	if r.x == asteroid.x && r.y == asteroid.y {
+		isEqual = true
+	}
+
+	return isEqual
 }
 
 func findAsteroids(asteroid_field []string) []Asteroid {
@@ -17,8 +51,8 @@ func findAsteroids(asteroid_field []string) []Asteroid {
 			letter := asteroid_field[y][x]
 
 			if letter == '#' {
-				detected_asteroid := Asteroid{x,y, 0}
-				asteroids_position = append(asteroids_position, detected_asteroid)
+				detected_asteroid := NewAsteroidInPosition(x,y)
+				asteroids_position = append(asteroids_position, *detected_asteroid)
 			}
 
 			x++
@@ -89,25 +123,33 @@ func count_observable_asteroids(asteroid_positions []Asteroid) {
 
 	base_index := 0
 	for base_index < len(asteroid_positions) {
-		asteroid_index := 0
-		for asteroid_index < len(asteroid_positions) {
-			if asteroid_index != base_index {
-				isSeen := true
-				obstacle_index := 0
-				for obstacle_index < len(asteroid_positions) {
-					if obstacle_index != base_index && obstacle_index != asteroid_index {
-						isSeen = isSeen && canSee(asteroid_positions[base_index], asteroid_positions[obstacle_index],asteroid_positions[asteroid_index])
-					}
-					obstacle_index++
-				}
-				if isSeen {
-					asteroid_positions[base_index].observable_asteroids++
-				}
-			}
-			asteroid_index++
-		}
+		base := &asteroid_positions[base_index]
+		checkAsteroidVisibility(asteroid_positions, base)
 
 		base_index++
+	}
+}
+
+func checkAsteroidVisibility(asteroid_positions []Asteroid, base *Asteroid) {
+	asteroid_index := 0
+	for asteroid_index < len(asteroid_positions) {
+		asteroid := asteroid_positions[asteroid_index]
+		if !asteroid.equal(*base) {
+			isSeen := true
+			obstacle_index := 0
+			for obstacle_index < len(asteroid_positions) {
+				obstacle := asteroid_positions[obstacle_index]
+				if !obstacle.equal(*base) && !obstacle.equal(asteroid) {
+					isSeen = isSeen && canSee(*base, obstacle, asteroid)
+				}
+				obstacle_index++
+			}
+			if isSeen {
+				base.observable_asteroids++
+				base.visibileAstroids = append(base.visibileAstroids, asteroid)
+			}
+		}
+		asteroid_index++
 	}
 }
 

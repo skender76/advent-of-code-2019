@@ -15,11 +15,11 @@ func TestMapCreation(t *testing.T) {
 
 func TestCannotSeeTargetBehindTheObstacle(t *testing.T) {
 
-	base := Asteroid{0,0,0}
-	obstacle := Asteroid{ 2, 0, 0}
-	target := Asteroid {3,0,0}
+	base := NewAsteroid()
+	obstacle := NewAsteroidInPosition( 2, 0)
+	target := NewAsteroidInPosition( 3, 0)
 
-	isSeen := canSee(base, obstacle, target)
+	isSeen := canSee(*base, *obstacle, *target)
 
 	if isSeen {
 		t.Errorf("Value %t but expected %t", isSeen , false) // to indicate test failed
@@ -28,11 +28,11 @@ func TestCannotSeeTargetBehindTheObstacle(t *testing.T) {
 
 func TestCanSeeTargetInFrontOfTheObstacle(t *testing.T) {
 
-	base := Asteroid{0,0,0}
-	obstacle := Asteroid{ 2, 0, 0}
-	target := Asteroid {1,0,0}
+	base := NewAsteroid()
+	obstacle := NewAsteroidInPosition( 2, 0)
+	target := NewAsteroidInPosition( 1, 0)
 
-	isSeen := canSee(base, obstacle, target)
+	isSeen := canSee(*base, *obstacle, *target)
 
 	if !isSeen {
 		t.Errorf("Value %t but expected %t", isSeen , true) // to indicate test failed
@@ -41,11 +41,11 @@ func TestCanSeeTargetInFrontOfTheObstacle(t *testing.T) {
 
 func TestCanSeenTargetBehindOrigin(t *testing.T) {
 
-	base := Asteroid{5,0,0}
-	obstacle := Asteroid{ 7, 0, 0}
-	target := Asteroid {4,0,0}
+	base := NewAsteroidInPosition( 5, 0)
+	obstacle := NewAsteroidInPosition( 7, 0)
+	target := NewAsteroidInPosition( 4, 0)
 
-	isSeen := canSee(base, obstacle, target)
+	isSeen := canSee(*base, *obstacle, *target)
 
 	if !isSeen {
 		t.Errorf("Value %t but expected %t", isSeen , true) // to indicate test failed
@@ -54,11 +54,11 @@ func TestCanSeenTargetBehindOrigin(t *testing.T) {
 
 func TestCanSeenTargetFarBehindOrigin(t *testing.T) {
 
-	base := Asteroid{5,0,0}
-	obstacle := Asteroid{ 7, 0, 0}
-	target := Asteroid {-8,0,0}
+	base := NewAsteroidInPosition( 5, 0)
+	obstacle := NewAsteroidInPosition( 7, 0)
+	target := NewAsteroidInPosition( -8, 0)
 
-	isSeen := canSee(base, obstacle, target)
+	isSeen := canSee(*base, *obstacle, *target)
 
 	if !isSeen {
 		t.Errorf("Value %t but expected %t", isSeen , true) // to indicate test failed
@@ -67,11 +67,11 @@ func TestCanSeenTargetFarBehindOrigin(t *testing.T) {
 
 func TestCannotSeeTargetBehindTheObstacleY(t *testing.T) {
 
-	base := Asteroid{0,0,0}
-	obstacle := Asteroid{ 0, 2, 0}
-	target := Asteroid {0,3,0}
+	base := NewAsteroid()
+	obstacle := NewAsteroidInPosition( 0, 2)
+	target := NewAsteroidInPosition( 0, 3)
 
-	isSeen := canSee(base, obstacle, target)
+	isSeen := canSee(*base, *obstacle, *target)
 
 	if isSeen {
 		t.Errorf("Value %t but expected %t", isSeen , false) // to indicate test failed
@@ -80,11 +80,11 @@ func TestCannotSeeTargetBehindTheObstacleY(t *testing.T) {
 
 func TestCanSeeTargetInFrontOfTheObstacleY(t *testing.T) {
 
-	base := Asteroid{0,0,0}
-	obstacle := Asteroid{ 0, 2, 0}
-	target := Asteroid {0,1,0}
+	base := NewAsteroid()
+	obstacle := NewAsteroidInPosition( 0, 2)
+	target := NewAsteroidInPosition( 0, 1)
 
-	isSeen := canSee(base, obstacle, target)
+	isSeen := canSee(*base, *obstacle, *target)
 
 	if !isSeen {
 		t.Errorf("Value %t but expected %t", isSeen , true) // to indicate test failed
@@ -93,11 +93,11 @@ func TestCanSeeTargetInFrontOfTheObstacleY(t *testing.T) {
 
 func TestCanSeenTargetBehindOriginY(t *testing.T) {
 
-	base := Asteroid{0,5,0}
-	obstacle := Asteroid{ 0, 7, 0}
-	target := Asteroid {0,4,0}
+	base := NewAsteroidInPosition( 0, 5)
+	obstacle := NewAsteroidInPosition( 0, 7)
+	target := NewAsteroidInPosition( 0, 4)
 
-	isSeen := canSee(base, obstacle, target)
+	isSeen := canSee(*base, *obstacle, *target)
 
 	if !isSeen {
 		t.Errorf("Value %t but expected %t", isSeen , true) // to indicate test failed
@@ -106,11 +106,11 @@ func TestCanSeenTargetBehindOriginY(t *testing.T) {
 
 func TestCanSeenTargetFarBehindOriginY(t *testing.T) {
 
-	base := Asteroid{0,5,0}
-	obstacle := Asteroid{ 0, 7, 0}
-	target := Asteroid {0,-8,0}
+	base := NewAsteroidInPosition( 0, 5)
+	obstacle := NewAsteroidInPosition( 0, 7)
+	target := NewAsteroidInPosition( 0, -8)
 
-	isSeen := canSee(base, obstacle, target)
+	isSeen := canSee(*base, *obstacle, *target)
 
 	if !isSeen {
 		t.Errorf("Value %t but expected %t", isSeen , true) // to indicate test failed
@@ -119,11 +119,11 @@ func TestCanSeenTargetFarBehindOriginY(t *testing.T) {
 
 func TestCanSeenTargetBehindOriginXY(t *testing.T) {
 
-	base := Asteroid{1,0,0}
-	obstacle := Asteroid{ 1, 2, 0}
-	target := Asteroid {4,4,0}
+	base := NewAsteroidInPosition( 1, 0)
+	obstacle := NewAsteroidInPosition( 1, 2)
+	target := NewAsteroidInPosition( 4, 4)
 
-	isSeen := canSee(base, obstacle, target)
+	isSeen := canSee(*base, *obstacle, *target)
 
 	if !isSeen {
 		t.Errorf("Value %t but expected %t", isSeen , true)
@@ -132,11 +132,11 @@ func TestCanSeenTargetBehindOriginXY(t *testing.T) {
 
 func TestCannotSeenTargetBehindOriginXY(t *testing.T) {
 
-	base := Asteroid{0,0,0}
-	obstacle := Asteroid{ 3, 2, 0}
-	target := Asteroid {6,2,0}
+	base := NewAsteroid()
+	obstacle := NewAsteroidInPosition( 3, 2)
+	target := NewAsteroidInPosition( 6, 2)
 
-	isSeen := canSee(base, obstacle, target)
+	isSeen := canSee(*base, *obstacle, *target)
 
 	if !isSeen {
 		t.Errorf("Value %t but expected %t", isSeen , true) // to indicate test failed
@@ -145,17 +145,17 @@ func TestCannotSeenTargetBehindOriginXY(t *testing.T) {
 
 func TestSimmetry(t *testing.T) {
 
-	base := Asteroid{0,0,0}
-	asteroid1 := Asteroid{3, 1, 0}
-	asteroid2 := Asteroid {6,2,0}
+	base := NewAsteroid()
+	asteroid1 := NewAsteroidInPosition( 3, 1)
+	asteroid2 := NewAsteroidInPosition( 6, 2)
 
-	isSeen := canSee(base, asteroid1, asteroid2)
+	isSeen := canSee(*base, *asteroid1, *asteroid2)
 
 	if isSeen {
 		t.Errorf("Value %t but expected %t", isSeen , false) // to indicate test failed
 	}
 
-	isSeen = canSee(base, asteroid2, asteroid1)
+	isSeen = canSee(*base, *asteroid2, *asteroid1)
 
 	if !isSeen {
 		t.Errorf("Value %t but expected %t", isSeen , true) // to indicate test failed
@@ -164,17 +164,17 @@ func TestSimmetry(t *testing.T) {
 
 func TestSimmetryY(t *testing.T) {
 
-	base := Asteroid{0,5,0}
-	asteroid1 := Asteroid{0, 7, 0}
-	asteroid2 := Asteroid {0,8,0}
+	base := NewAsteroidInPosition(0, 5)
+	asteroid1 := NewAsteroidInPosition( 0, 7)
+	asteroid2 := NewAsteroidInPosition( 0, 8)
 
-	isSeen := canSee(base, asteroid1, asteroid2)
+	isSeen := canSee(*base, *asteroid1, *asteroid2)
 
 	if isSeen {
 		t.Errorf("Value %t but expected %t", isSeen , false) // to indicate test failed
 	}
 
-	isSeen = canSee(base, asteroid2, asteroid1)
+	isSeen = canSee(*base, *asteroid2, *asteroid1)
 
 	if !isSeen {
 		t.Errorf("Value %t but expected %t", isSeen , true) // to indicate test failed
@@ -183,17 +183,17 @@ func TestSimmetryY(t *testing.T) {
 
 func TestSimmetryX(t *testing.T) {
 
-	base := Asteroid{5,0,0}
-	asteroid1 := Asteroid{7, 0, 0}
-	asteroid2 := Asteroid {8,0,0}
+	base := NewAsteroidInPosition(5, 0)
+	asteroid1 := NewAsteroidInPosition( 7, 0)
+	asteroid2 := NewAsteroidInPosition( 8, 0)
 
-	isSeen := canSee(base, asteroid1, asteroid2)
+	isSeen := canSee(*base, *asteroid1, *asteroid2)
 
 	if isSeen {
 		t.Errorf("Value %t but expected %t", isSeen , false) // to indicate test failed
 	}
 
-	isSeen = canSee(base, asteroid2, asteroid1)
+	isSeen = canSee(*base, *asteroid2, *asteroid1)
 
 	if !isSeen {
 		t.Errorf("Value %t but expected %t", isSeen , true) // to indicate test failed
@@ -202,11 +202,11 @@ func TestSimmetryX(t *testing.T) {
 
 func TestCanSeenTargetNotAlignedOnY(t *testing.T) {
 
-	base := Asteroid{5,0,0}
-	obstacle := Asteroid{ 7, 0, 0}
-	target := Asteroid {8,1,0}
+	base := NewAsteroidInPosition(5,0)
+	obstacle := NewAsteroidInPosition( 7, 0)
+	target := NewAsteroidInPosition( 8, 1)
 
-	isSeen := canSee(base, obstacle, target)
+	isSeen := canSee(*base, *obstacle, *target)
 
 	if !isSeen {
 		t.Errorf("Value %t but expected %t", isSeen , true) // to indicate test failed
@@ -215,11 +215,11 @@ func TestCanSeenTargetNotAlignedOnY(t *testing.T) {
 
 func TestCanSeenOnDiagonal(t *testing.T) {
 
-	base := Asteroid{0,2,0}
-	obstacle := Asteroid{ 3, 4, 0}
-	target := Asteroid {4,4,0}
+	base := NewAsteroidInPosition(0,2)
+	obstacle := NewAsteroidInPosition( 3, 4)
+	target := NewAsteroidInPosition( 4, 4)
 
-	isSeen := canSee(base, obstacle, target)
+	isSeen := canSee(*base, *obstacle, *target)
 
 	if !isSeen {
 		t.Errorf("Value %t but expected %t", isSeen , true) // to indicate test failed
@@ -228,11 +228,11 @@ func TestCanSeenOnDiagonal(t *testing.T) {
 
 func TestCanSeeInTheMiddleOfDiagonal(t *testing.T) {
 
-	base := Asteroid{2,2,0}
-	obstacle := Asteroid{ 1, 1, 0}
-	target := Asteroid {3,3,0}
+	base := NewAsteroidInPosition(2,2)
+	obstacle := NewAsteroidInPosition( 1, 1)
+	target := NewAsteroidInPosition( 3, 3)
 
-	isSeen := canSee(base, obstacle, target)
+	isSeen := canSee(*base, *obstacle, *target)
 
 	if !isSeen {
 		t.Errorf("Value %t but expected %t", isSeen , true) // to indicate test failed

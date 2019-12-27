@@ -3,26 +3,22 @@ package main
 import "fmt"
 
 func main() {
-	//var asteroid_map = []string{
-	//	".#........",
-	//	"..#.......",
-	//	"...#......"}
-	//
-	//n_asteroids := findAsteroids(asteroid_map)
-	//
-	//count_observable_asteroids(n_asteroids)
-	//
-	//found, _ := find_base(n_asteroids)
-	//
-	//fmt.Println(found)
-	//fmt.Println(n_asteroids)
+	var asteroid_map = []string{
+		".#..#",
+		".....",
+		"#####",
+		"....#",
+		"...##"}
 
-	base := Asteroid{2,2,0}
-	obstacle := Asteroid{ 1, 1, 0}
-	target := Asteroid {3,3,0}
+	n_asteroids := findAsteroids(asteroid_map)
 
-	isSeen := canSee(base, obstacle, target)
+	count_observable_asteroids(n_asteroids)
 
-	fmt.Println(isSeen)
+	found, base := find_base(n_asteroids)
+	if found {
+		fmt.Println("Base (",base.x,",",base.y,") = ",base.observable_asteroids,"visible asteroids")
+	} else {
+		fmt.Println("Error: not found any base!!")
+	}
 
 }
