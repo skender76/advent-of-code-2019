@@ -48,3 +48,28 @@ func equal(x, y float64 ) bool {
 
 	 return isEqual
 }
+
+func isZero(x float64) bool {
+	isZero := true
+
+	if x < -EPSILON || x > EPSILON {
+		isZero = false
+	}
+
+	return isZero
+}
+
+func compare(x, y float64 ) int {
+	result := 1
+	diff := x - y
+
+	if diff > -EPSILON && diff < EPSILON {
+		result = 0
+	} else if diff > EPSILON {
+		result = 1
+	} else {
+		result = -1
+	}
+
+	return result
+}

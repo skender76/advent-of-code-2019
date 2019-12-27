@@ -1,31 +1,70 @@
 package main
 
+import "math"
+
+type AsteroidPosition struct {
+	x int
+	y int
+}
+
+func NewAsteroidPosition(x,y int) *AsteroidPosition {
+	pos := new(AsteroidPosition)
+	pos.x = x
+	pos.y = y
+	return pos
+}
+
+type VisibleAsteroidFromBase struct {
+	position AsteroidPosition
+	base_position AsteroidPosition
+	angular_position float64
+}
+
+func calcAngle(asteroid, base AsteroidPosition) float64 {
+	tan := float64(asteroid.y - base.y) / float64(asteroid.x - base.x)
+	angle := math.Pi
+
+	if base.x <= asteroid.x {
+		angle = math.Pi/2 + math.Atan(tan)
+	} else {
+		angle = ((3*math.Pi)/2) + math.Atan(tan)
+	}
+
+	return  angle
+}
+
+func NewVisibleAsteroidFromBase(asteroid, base AsteroidPosition) *VisibleAsteroidFromBase {
+	pos := new(VisibleAsteroidFromBase)
+	pos.position = asteroid
+	pos.base_position = base
+
+	pos.angular_position = calcAngle(asteroid, base)
+
+	return pos
+}
 
 
 type Asteroid struct {
-	x int
-	y int
+	position AsteroidPosition
 	observable_asteroids int
-	visibileAstroids []Asteroid
+	visibileAstroids []VisibleAsteroidFromBase
 	angular_coeff_from_base float64
 }
 
 func NewAsteroid() *Asteroid {
 	p := new(Asteroid)
-	p.x = 0
-	p.y = 0
+	p.position = *NewAsteroidPosition(0,0)
 	p.observable_asteroids = 0
-	p.visibileAstroids = []Asteroid{}
+	p.visibileAstroids = []VisibleAsteroidFromBase{}
 	p.angular_coeff_from_base = 0.0
 	return p
 }
 
 func NewAsteroidInPosition(x,y int) *Asteroid {
 	p := new(Asteroid)
-	p.x = x
-	p.y = y
+	p.position = *NewAsteroidPosition(x,y)
 	p.observable_asteroids = 0
-	p.visibileAstroids = []Asteroid{}
+	p.visibileAstroids = []VisibleAsteroidFromBase{}
 	p.angular_coeff_from_base = 0.0
 	return p
 }
@@ -33,11 +72,21 @@ func NewAsteroidInPosition(x,y int) *Asteroid {
 func (r *Asteroid)equal(asteroid Asteroid) bool {
 	isEqual := false
 
-	if r.x == asteroid.x && r.y == asteroid.y {
+	if r.position.x == asteroid.position.x && r.position.y == asteroid.position.y {
 		isEqual = true
 	}
 
 	return isEqual
+}
+
+func (r *Asteroid)isHitBy(positionHit VisibleAsteroidFromBase) bool {
+	isHit := false
+
+	if r.position.x == positionHit.position.x && r.position.y == positionHit.position.y {
+		isHit = true
+	}
+
+	return isHit
 }
 
 func findAsteroids(asteroid_field []string) []Asteroid {
@@ -64,26 +113,55 @@ func findAsteroids(asteroid_field []string) []Asteroid {
 	return asteroids_position
 }
 
+func remove_asteroid_hit(asteroid_field []Asteroid, asteroid_hit []VisibleAsteroidFromBase) []Asteroid {
+	new_map := []Asteroid{}
+
+	asteroid_counter := 0
+
+	for asteroid_counter < len(asteroid_field) {
+		isHit := false
+		asteroid_hit_counter := 0
+
+		for asteroid_hit_counter < len(asteroid_hit) {
+			if asteroid_field[asteroid_counter].isHitBy(asteroid_hit[asteroid_hit_counter]) {
+				isHit = isHit || true
+			}
+
+			asteroid_hit_counter++
+		}
+
+		if !isHit {
+			new_map = append(new_map, asteroid_field[asteroid_counter])
+		}
+
+		asteroid_counter++
+	}
+
+
+
+	return new_map
+}
+
 func checkIfObstacleBetweenOriginAndTarget(base Asteroid, obstacle Asteroid, target Asteroid) bool {
 	isBetweenX := false
 	isBeetweenY := false
 
-	if base.x <= target.x {
-		if base.x <= obstacle.x && obstacle.x <= target.x {
+	if base.position.x <= target.position.x {
+		if base.position.x <= obstacle.position.x && obstacle.position.x <= target.position.x {
 			isBetweenX = true
 		}
 	} else {
-		if target.x < obstacle.x && obstacle.x <= base.x {
+		if target.position.x < obstacle.position.x && obstacle.position.x <= base.position.x {
 			isBetweenX = true
 		}
 	}
 
-	if base.y <= target.y {
-		if base.y <= obstacle.y && obstacle.y <= target.y {
+	if base.position.y <= target.position.y {
+		if base.position.y <= obstacle.position.y && obstacle.position.y <= target.position.y {
 			isBeetweenY = true
 		}
 	} else {
-		if target.y < obstacle.y && obstacle.y <= base.y {
+		if target.position.y < obstacle.position.y && obstacle.position.y <= base.position.y {
 			isBeetweenY = true
 		}
 	}
@@ -96,22 +174,22 @@ func canSee(base Asteroid, obstacle Asteroid, target Asteroid) bool {
 
 	isSeen := true
 
-	if base.x != obstacle.x && base.y != obstacle.y {
+	if base.position.x != obstacle.position.x && base.position.y != obstacle.position.y {
 
 		if checkIfObstacleBetweenOriginAndTarget(base, obstacle, target) {
-			value := ((float64((obstacle.y - base.y) * (target.x - base.x)) / float64(obstacle.x - base.x)) + float64(base.y))
-			isSeen = !equal(float64(target.y),value)
+			value := ((float64((obstacle.position.y - base.position.y) * (target.position.x - base.position.x)) / float64(obstacle.position.x - base.position.x)) + float64(base.position.y))
+			isSeen = !equal(float64(target.position.y),value)
 		}
-	} else if base.y == obstacle.y && base.y == target.y {
-			if base.x < obstacle.x && target.x > obstacle.x {
+	} else if base.position.y == obstacle.position.y && base.position.y == target.position.y {
+			if base.position.x < obstacle.position.x && target.position.x > obstacle.position.x {
 				isSeen = false
-			} else if base.x > obstacle.x && target.x < obstacle.x {
+			} else if base.position.x > obstacle.position.x && target.position.x < obstacle.position.x {
 				isSeen = false
 			}
-	} else if base.x == obstacle.x && base.x == target.x {
-		if base.y < obstacle.y && target.y > obstacle.y {
+	} else if base.position.x == obstacle.position.x && base.position.x == target.position.x {
+		if base.position.y < obstacle.position.y && target.position.y > obstacle.position.y {
 			isSeen = false
-		} else if base.y > obstacle.y && target.y < obstacle.y {
+		} else if base.position.y > obstacle.position.y && target.position.y < obstacle.position.y {
 			isSeen = false
 		}
 	}
@@ -124,13 +202,13 @@ func count_observable_asteroids(asteroid_positions []Asteroid) {
 	base_index := 0
 	for base_index < len(asteroid_positions) {
 		base := &asteroid_positions[base_index]
-		checkAsteroidVisibility(asteroid_positions, base)
+		count_observable_asteroids_from_base(asteroid_positions, base)
 
 		base_index++
 	}
 }
 
-func checkAsteroidVisibility(asteroid_positions []Asteroid, base *Asteroid) {
+func count_observable_asteroids_from_base(asteroid_positions []Asteroid, base *Asteroid) {
 	asteroid_index := 0
 	for asteroid_index < len(asteroid_positions) {
 		asteroid := asteroid_positions[asteroid_index]
@@ -146,7 +224,8 @@ func checkAsteroidVisibility(asteroid_positions []Asteroid, base *Asteroid) {
 			}
 			if isSeen {
 				base.observable_asteroids++
-				base.visibileAstroids = append(base.visibileAstroids, asteroid)
+				visibibleAsteroid := NewVisibleAsteroidFromBase(asteroid.position, base.position)
+				base.visibileAstroids = append(base.visibileAstroids, *visibibleAsteroid)
 			}
 		}
 		asteroid_index++
